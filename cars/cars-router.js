@@ -4,7 +4,9 @@ const db = require("../data/connection.js");
 const router = express.Router();
 
 router.get('/', (req, res) => {
-  db('cars')
+  db
+  .select('*')
+  .from('cars')
   .then(cars => {
     res.json(cars); 
   })
@@ -14,11 +16,12 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  const { id } = req.params;
-
-  db('cars').where({ id }).first()
+  db.select("*")
+    .from("cars")
+    .where({ ID: req.params.id })
+    .first()
   .then(car => {
-    if (response)
+    if (car)
             { res.status(200).json({ car }); }
         else
             { res.status(404).json({message: "No account with id " + req.params.id + " found."});
@@ -30,8 +33,9 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const carData = req.body;
-  db('cars').insert(carData)
+  db
+  .insert(req.body, 'id')
+  .into('cars')
   .then(ids => {
     db('cars').where({ id: ids[0] })
     .then(newCarEntry => {
